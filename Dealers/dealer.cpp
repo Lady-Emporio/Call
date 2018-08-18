@@ -89,7 +89,6 @@ void Dealer::isOpen()
     subWindow1->setSystemMenu(nullptr);
     subWindow2->setSystemMenu(nullptr);
 
-    mdiArea->setActiveSubWindow(subWindow1);
     connect(fullCall, SIGNAL(sig_refresh(QString)), this, SLOT(refreshSubTable(QString)));
     connect(email, SIGNAL(sig_refresh(QString)), this, SLOT(refreshSubTable(QString)));
 
@@ -113,18 +112,20 @@ void Dealer::sql_CreateNewDealer()
     attributes.insert("_comment",commentEdit->toPlainText());
     attributes.insert("_activePhone",activePhoneEdit->text());
     attributes.insert("_distryPhone",distryPhoneEdit->text());
+    attributes.insert("title",parameters.value("title"));
     emit sig_CreateNewDealer(attributes);
 }
 
 void Dealer::sql_UpdateNewDealer()
 {
-//    QMap<QString,QString> attributes;
-//    attributes.insert("_code",codeEdit->text());
-//    attributes.insert("_name",nameEdit->text());
-//    attributes.insert("_comment",commentEdit->toPlainText());
-//    attributes.insert("_activePhone",activePhoneEdit->text());
-//    attributes.insert("_distryPhone",distryPhoneEdit->text());
-//    emit sig_update(attributes);
+    QMap<QString,QString> attributes;
+    attributes.insert("_code",parameters.value("_code"));
+    attributes.insert("new_code",codeEdit->text());
+    attributes.insert("_name",nameEdit->text());
+    attributes.insert("_comment",commentEdit->toPlainText());
+    attributes.insert("_activePhone",activePhoneEdit->text());
+    attributes.insert("_distryPhone",distryPhoneEdit->text());
+    emit sig_update(attributes);
     auto sublist= mdiArea->subWindowList();
     for(auto subWindow:sublist){
         if(subWindow->widget()->objectName()=="SubTable"){
@@ -158,7 +159,6 @@ void Dealer::sql_UpdateNewDealer()
             }
             widget->listUpdateTW.clear();
 
-
             if(widget->isNeedWrite!=nullptr){
                 int row=widget->t->row(widget->isNeedWrite);
                 QMap<QString,QString>attr;
@@ -178,6 +178,7 @@ void Dealer::sql_UpdateNewDealer()
                 }
                 emit sig_createRowSubTable(attr);
                 widget->isNeedWrite=nullptr;
+                widget->conditionalAppearance();
             }
         }
     }

@@ -43,12 +43,14 @@ void SubTable::conditionalAppearance()
         int row=t->row(isNeedWrite);
         for(int i=0;i!=t->columnCount();++i){
             QTableWidgetItem * item=t->item(row,i);
-            //QBrush colorNewRow;
-            //colorNewRow.setColor(QColor(255,0,0));
-            //item->setBackground(Qt::red);
-            //item->setText(QString("").setNum(i)+"|"+QString("").setNum(isNeedWrite));
             item->setBackgroundColor(Qt::red);
+            conditionalAppearanceList.append(item);
         }
+    }else{
+        for(auto item:conditionalAppearanceList){
+            item->setBackgroundColor(Qt::white);
+        }
+        conditionalAppearanceList.clear();
     }
 }
 
@@ -90,7 +92,6 @@ void SubTable::closeEditor(QWidget *w, QAbstractItemDelegate::EndEditHint wtf)
     int row=t->row(edited);
     if(isNeedWrite==nullptr || row!=t->row(isNeedWrite)){
         if(!listUpdateTW.contains(edited)){
-            qDebug()<<edited->text()<<edited;
             listUpdateTW.append(edited);
         }
     }
@@ -101,6 +102,7 @@ void SubTable::closeEditor(QWidget *w, QAbstractItemDelegate::EndEditHint wtf)
 void SubTable::action_addNewRow()
 {
     if(isNeedWrite==nullptr){
+        conditionalAppearance();
         emit sin_NewRow(table_name);
     }
 }
@@ -108,6 +110,7 @@ void SubTable::action_addNewRow()
 void SubTable::action_Refresh()
 {
     isNeedWrite=nullptr;
+    conditionalAppearance();
     emit sig_refresh(table_name);
 }
 

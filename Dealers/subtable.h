@@ -18,14 +18,14 @@ class SubTable : public QWidget
     Q_OBJECT
     void makeGui();
     QMap<QString,QString> parameters;
-
-    void conditionalAppearance();
 public:
+    void conditionalAppearance();
     QTableWidget *t;
     QTableWidgetItem* isNeedWrite;
     QString table_name;
     QList<QTableWidgetItem*>listUpdateTW;
     int _Version;
+    QList<QTableWidgetItem*>conditionalAppearanceList;
     explicit SubTable(QMap<QString,QString> parameters,QWidget *parent = 0);
 signals:
     void sin_NewRow(QString table_name);

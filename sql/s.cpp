@@ -130,12 +130,14 @@ void S::createNewDealer(QMap<QString, QString> attributes)
 void S::updateDealer(QMap<QString, QString> attributes)
 {
     QSqlQuery query(db);
-    query.prepare("UPDATE dealers SET _code=:_code, "
+    query.prepare("UPDATE dealers SET _code=:new_code, "
                   "_name=:_name, "
                   "_comment=:_comment, "
                   "_activePhone=:_activePhone, "
                   "_distryPhone=:_distryPhone "
                   " WHERE _code=:_code; ");
+
+    query.bindValue(":new_code", attributes.value("new_code"));
     query.bindValue(":_code", attributes.value("_code"));
     query.bindValue(":_name", attributes.value("_name"));
     query.bindValue(":_comment", attributes.value("_comment"));
@@ -191,10 +193,11 @@ void S::createFullCall(QMap<QString, QString> attributes)
 void S::updateFullCall(QMap<QString, QString> attributes)
 {
     QSqlQuery query(db);
-    query.prepare("UPDATE full_call SET _date=:_date, "
-                  " _comment=:_comment, "
-                  " _source=:_source "
-                  " WHERE _row=:_row,_parent=:_parent; ");
+    QString sql="UPDATE full_call SET _date=:_date, "
+                " _comment=:_comment, "
+                " _source=:_source "
+                " WHERE _row=:_row AND _parent=:_parent; ";
+    query.prepare(sql);
     query.bindValue(":_row", attributes.value("_row").toInt());
     query.bindValue(":_date", attributes.value("_date"));
     query.bindValue(":_comment", attributes.value("_comment"));

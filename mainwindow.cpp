@@ -65,6 +65,7 @@ void MainWindow::CreateNewDealer()
     subWindow->setWindowTitle(title);
     QMap<QString,QString>parameters;
     parameters.insert("New","CreateNew");
+    parameters.insert("title",title);
     Dealer * widget=new Dealer(parameters,this);
     subWindow->setWidget(widget);
     mdiArea->addSubWindow(subWindow);
@@ -78,6 +79,12 @@ void MainWindow::sql_CreateNewDealer(QMap<QString, QString> attr)
 {
     S::s()->createNewDealer(attr);
     sql_dealerList();
+    QList<QMdiSubWindow *>	allSub=mdiArea->subWindowList();
+    for(QMdiSubWindow *x:allSub){
+        if(x->windowTitle()==attr.value("title")){
+            x->close();
+        };
+    };
 }
 
 void MainWindow::sql_dealerList()
@@ -115,6 +122,16 @@ void MainWindow::sql_openDealer(QString code)
     connect(this, SIGNAL(sig_newRow(QMap<QString,QString>,QString)), widget, SLOT(setNewRowInSubTable(QMap<QString,QString>,QString)));
     connect(widget, SIGNAL(sig_createRowSubTable(QMap<QString,QString>)), this, SLOT(sql_createRowSubTable(QMap<QString,QString>)));
     connect(widget, SIGNAL(sig_UpdateST(QMap<QString,QString>)), this, SLOT(sql_updateSubT(QMap<QString,QString>)));
+
+    widget->refreshSubTable("full_call");
+    widget->refreshSubTable("email");
+
+    for(auto subWin:widget->mdiArea->subWindowList()){
+        if(subWin->windowTitle()=="Full call"){
+            widget->mdiArea->setActiveSubWindow(subWin);
+            break;
+        }
+    }
 }
 
 void MainWindow::sql_updateDealer(QMap<QString, QString> attr)
@@ -128,7 +145,6 @@ void MainWindow::sql_refreshDealer(QMap<QString, QString> attr)
     QString table=attr.value("table");
     QString code=attr.value("_code");
     QString title=attr.value("title");
-
     if(table=="full_call"){
         QList<QMap<QString,QString>>list_fc=S::s()->getFullCall_listForm(code);
         emit sig_refreshSubTable(attr,list_fc);
@@ -162,7 +178,6 @@ void MainWindow::sql_updateSubT(QMap<QString, QString> parameters)
 {
     QString table=parameters.value("table");
     if(table=="full_call"){
-        qDebug()<<parameters;
         S::s()->updateFullCall(parameters);
     }else if(table=="email"){
         S::s()->updateEmail(parameters);

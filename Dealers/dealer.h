@@ -15,11 +15,12 @@ class Dealer : public QWidget
     QLineEdit *activePhoneEdit;
     QLineEdit *distryPhoneEdit;
     QTextEdit *commentEdit;
-    QMdiArea *mdiArea;
+
 private slots:
     void sql_CreateNewDealer();
     void sql_UpdateNewDealer();
 public:
+    QMdiArea *mdiArea;
     explicit Dealer(QMap<QString,QString> parameters, QWidget *parent = 0);
 public slots:
     void refreshSubTable(QString table);
