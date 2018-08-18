@@ -50,4 +50,5 @@
 #include <QTableWidget>
 #include <QSizePolicy>
 #include <QAction>
+#include <QStyledItemDelegate>
 #endif // INCLUDE_H

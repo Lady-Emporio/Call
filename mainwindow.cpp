@@ -72,7 +72,6 @@ void MainWindow::CreateNewDealer()
     subWindow->show();
 
     connect(widget, SIGNAL(sig_CreateNewDealer(QMap<QString,QString>)), this, SLOT(sql_CreateNewDealer(QMap<QString,QString>)));
-
 }
 
 void MainWindow::sql_CreateNewDealer(QMap<QString, QString> attr)
@@ -92,6 +91,7 @@ void MainWindow::sql_openDealer(QString code)
     QMap<QString,QString> attr=S::s()->getDealer_objectForm(code);
 
     QString title="Dealer:"+attr.value("_code");
+    attr.insert("title",title);
     QList<QMdiSubWindow *>	allSub=mdiArea->subWindowList();
     for(QMdiSubWindow *x:allSub){
         if(x->windowTitle()==title){
@@ -101,7 +101,6 @@ void MainWindow::sql_openDealer(QString code)
     };
     QMdiSubWindow *subWindow = new QMdiSubWindow(this);
     subWindow->setWindowTitle(title);
-
     Dealer * widget=new Dealer(attr,this);
     subWindow->setWidget(widget);
     mdiArea->addSubWindow(subWindow);
@@ -109,6 +108,11 @@ void MainWindow::sql_openDealer(QString code)
     subWindow->show();
 
     connect(widget, SIGNAL(sig_update(QMap<QString,QString>)), this, SLOT(sql_updateDealer(QMap<QString,QString>)));
+    connect(widget, SIGNAL(sig_refreshSubTable(QMap<QString,QString>)), this, SLOT(sql_refreshDealer(QMap<QString,QString>)));
+    connect(this, SIGNAL(sig_refreshSubTable(QMap<QString,QString>,QList<QMap<QString,QString>>)),
+            widget, SLOT(refreshSubTable(QMap<QString,QString>,QList<QMap<QString,QString>>)));
+    connect(widget, SIGNAL(sig_newRowSubTable(QMap<QString,QString>)), this, SLOT(sql_NewRow(QMap<QString,QString>)));
+    connect(this, SIGNAL(sig_newRow(QMap<QString,QString>,QString)), widget, SLOT(setNewRowInSubTable(QMap<QString,QString>,QString)));
 }
 
 void MainWindow::sql_updateDealer(QMap<QString, QString> attr)
@@ -116,3 +120,29 @@ void MainWindow::sql_updateDealer(QMap<QString, QString> attr)
     S::s()->updateDealer(attr);
     sql_dealerList();
 }
+
+void MainWindow::sql_refreshDealer(QMap<QString, QString> attr)
+{
+    QString table=attr.value("table");
+    QString code=attr.value("_code");
+    QString title=attr.value("title");
+
+    if(table=="full_call"){
+        QList<QMap<QString,QString>>list_fc=S::s()->getFullCall_listForm(code);
+        emit sig_refreshSubTable(attr,list_fc);
+    }else if(table=="email"){
+        QList<QMap<QString,QString>>list_e=S::s()->getEmail_listForm(code);
+        emit sig_refreshSubTable(attr,list_e);
+    }
+}
+
+void MainWindow::sql_NewRow(QMap<QString, QString> parameters)
+{
+    QString table=parameters.value("table");
+    QString code=parameters.value("_code");
+    QString title=parameters.value("title");
+    QString newRow=S::s()->getNewRowNomber(table,code);
+    emit sig_newRow(parameters,newRow);
+
+}
+

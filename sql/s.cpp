@@ -152,11 +152,11 @@ QList<QMap<QString, QString> > S::getFullCall_listForm(QString code)
 {
     QList<QMap<QString, QString> > callList;
     QSqlQuery query(db);
-    QString sql="SELECT _row,_date,_comment,_source FROM call_dealer "
+    QString sql="SELECT _row,_date,_comment,_source FROM full_call "
                 " WHERE _parent=:_parent ORDER BY _row;";
     query.prepare(sql);
     query.bindValue(":_code", code);
-    if(!query.exec(sql)){
+    if(!query.exec()){
         getError(&query,"Can`t get CallDealerList from parent="+code);
         return callList;
     }
@@ -209,11 +209,11 @@ QList<QMap<QString, QString> > S::getEmail_listForm(QString code)
 {
     QList<QMap<QString, QString> > mailList;
     QSqlQuery query(db);
-    QString sql="SELECT _row,_date,_mail,_comment FROM call_dealer "
+    QString sql="SELECT _row,_date,_mail,_comment FROM email "
                 " WHERE _parent=:_parent ORDER BY _row;";
     query.prepare(sql);
-    query.bindValue(":_code", code);
-    if(!query.exec(sql)){
+    query.bindValue(":_parent", code);
+    if(!query.exec()){
         getError(&query,"Can`t get mailList from parent="+code);
         return mailList;
     }
@@ -260,4 +260,22 @@ void S::updateEmail(QMap<QString, QString> attributes)
         return;
     };
     db.commit();
+}
+
+QString S::getNewRowNomber(QString table, QString parent)
+{
+    QSqlQuery query(db);
+    if(table=="full_call"){
+        query.prepare("select ifnull(Max(_row),0) as rows from full_call where _parent=:_parent;");
+    }else if(table=="email"){
+        query.prepare("select ifnull(Max(_row),0) as rows from email where _parent=:_parent;");
+    }
+    query.bindValue(":_parent", parent);
+    if(!query.exec()){
+        getError(&query,"Can`t update Email where parent="+parent);
+        return "";
+    };
+    query.next();
+    QString newRow=QString("").setNum( query.value("rows").toInt()+1  );
+    return newRow;
 }

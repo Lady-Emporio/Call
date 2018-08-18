@@ -1,7 +1,5 @@
 #include "dealer_list.h"
 
-
-
 Dealer_list::Dealer_list(QWidget *parent) : QWidget(parent)
 {
     makeGui();

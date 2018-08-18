@@ -27,6 +27,8 @@ public:
     QList<QMap<QString,QString>>getEmail_listForm(QString code);
     void createEmail(QMap<QString,QString> attributes);
     void updateEmail(QMap<QString,QString> attributes);
+
+    QString getNewRowNomber(QString table,QString parent);
 };
 
 #endif // S_H
