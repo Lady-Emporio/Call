@@ -33,6 +33,8 @@ signals:
     void sig_newRowSubTable(QMap<QString,QString> parameters);
     void sig_newRow(QString table,QString row);
     void sin_SubTableRef(QMap<QString, QString> attr, QList<QMap<QString, QString> > data);
+    void sig_createRowSubTable(QMap<QString,QString> attr);
+    void sig_UpdateST(QMap<QString,QString> attr);
 };
 
 

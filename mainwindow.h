@@ -24,6 +24,8 @@ public slots:
     void sql_updateDealer(QMap<QString,QString> attr);
     void sql_refreshDealer(QMap<QString,QString> attr);
     void sql_NewRow(QMap<QString,QString>parameters);
+    void sql_createRowSubTable(QMap<QString,QString>parameters);
+    void sql_updateSubT(QMap<QString,QString>parameters);
 signals:
     void dealerListRefresh(QList<QMap<QString,QString>> dlist);
     void sig_refreshSubTable(QMap<QString,QString>attr,QList<QMap<QString,QString>>data);

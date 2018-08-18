@@ -4,6 +4,7 @@ SubTable::SubTable(QMap<QString,QString> parameters,QWidget *parent) : QWidget(p
 {
     table_name=parameters.value("table_name");
     isNeedWrite=nullptr;
+    _Version=0;
     this->setObjectName("SubTable");
     makeGui();
 }
@@ -22,6 +23,9 @@ void SubTable::makeGui()
     t->setHorizontalHeaderLabels(headers);
     t->setSortingEnabled(true);
     t->setItemDelegateForColumn(0,new NotEditableDelegate(this));
+
+    connect(t->itemDelegate(), SIGNAL(closeEditor(QWidget *, QAbstractItemDelegate::EndEditHint)), this,
+            SLOT(closeEditor(QWidget *, QAbstractItemDelegate::EndEditHint)));
 
     QVBoxLayout * mainLayout=new QVBoxLayout(this);
     this->setLayout(mainLayout);
@@ -51,15 +55,20 @@ void SubTable::conditionalAppearance()
 void SubTable::refresh(QMap<QString, QString> attr, QList<QMap<QString, QString> > data)
 {
     if(attr.value("table")==table_name){
+        ++_Version;
         t->clearContents();
         t->setRowCount(data.length());
         for(int i=0;i!=data.length();++i){
             QMap<QString,QString> row=data[i];
             if(table_name=="full_call"){
-                t->setItem(i,0,new QTableWidgetItem(row.value("_row")));
-                t->setItem(i,1,new QTableWidgetItem(row.value("_date")));
-                t->setItem(i,2,new QTableWidgetItem(row.value("_comment")));
-                t->setItem(i,3,new QTableWidgetItem(row.value("_source")));
+                QTableWidgetItem * c0=new QTableWidgetItem(row.value("_row"));
+                QTableWidgetItem * c1=new QTableWidgetItem(row.value("_date"));
+                QTableWidgetItem * c2=new QTableWidgetItem(row.value("_comment"));
+                QTableWidgetItem * c3=new QTableWidgetItem(row.value("_source"));
+                t->setItem(i,0,c0);
+                t->setItem(i,1,c1);
+                t->setItem(i,2,c2);
+                t->setItem(i,3,c3);
             }else if(table_name=="email"){
                 t->setItem(i,0,new QTableWidgetItem(row.value("_row")));
                 t->setItem(i,1,new QTableWidgetItem(row.value("_date")));
@@ -68,6 +77,25 @@ void SubTable::refresh(QMap<QString, QString> attr, QList<QMap<QString, QString>
             }
         }
     }
+}
+
+void SubTable::closeEditor(QWidget *w, QAbstractItemDelegate::EndEditHint wtf)
+{
+    static int localVersion=_Version;
+    if(localVersion!=_Version){
+        localVersion=_Version;
+        listUpdateTW.clear();
+    }
+    QTableWidgetItem * edited=t->itemAt(w->pos());
+    int row=t->row(edited);
+    if(isNeedWrite==nullptr || row!=t->row(isNeedWrite)){
+        if(!listUpdateTW.contains(edited)){
+            qDebug()<<edited->text()<<edited;
+            listUpdateTW.append(edited);
+        }
+    }
+
+
 }
 
 void SubTable::action_addNewRow()

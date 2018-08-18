@@ -16,7 +16,6 @@ public:
 class SubTable : public QWidget
 {
     Q_OBJECT
-    QString table_name;
     void makeGui();
     QMap<QString,QString> parameters;
 
@@ -25,6 +24,8 @@ public:
     QTableWidget *t;
     QTableWidgetItem* isNeedWrite;
     QString table_name;
+    QList<QTableWidgetItem*>listUpdateTW;
+    int _Version;
     explicit SubTable(QMap<QString,QString> parameters,QWidget *parent = 0);
 signals:
     void sin_NewRow(QString table_name);
@@ -34,6 +35,8 @@ public slots:
     void action_Refresh();
     void addNewRow(QString table,QString nomber);
     void refresh(QMap<QString, QString> attr, QList<QMap<QString, QString> > data);
+
+    void closeEditor(QWidget *w, QAbstractItemDelegate::EndEditHint wtf);
 };
 
 #endif // SUBTABLE_H

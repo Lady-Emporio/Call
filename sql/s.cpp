@@ -155,17 +155,17 @@ QList<QMap<QString, QString> > S::getFullCall_listForm(QString code)
     QString sql="SELECT _row,_date,_comment,_source FROM full_call "
                 " WHERE _parent=:_parent ORDER BY _row;";
     query.prepare(sql);
-    query.bindValue(":_code", code);
+    query.bindValue(":_parent", code);
     if(!query.exec()){
         getError(&query,"Can`t get CallDealerList from parent="+code);
         return callList;
     }
     while(query.next()){
         QMap<QString, QString> nextCall;
-        nextCall.insert("_row",query.value("_code").toString());
-        nextCall.insert("_date",query.value("_name").toString());
-        nextCall.insert("_comment",query.value("_name").toString());
-        nextCall.insert("_source",query.value("_name").toString());
+        nextCall.insert("_row",query.value("_row").toString());
+        nextCall.insert("_date",query.value("_date").toString());
+        nextCall.insert("_comment",query.value("_comment").toString());
+        nextCall.insert("_source",query.value("_source").toString());
         callList.append(nextCall);
     }
     return callList;
@@ -192,12 +192,14 @@ void S::updateFullCall(QMap<QString, QString> attributes)
 {
     QSqlQuery query(db);
     query.prepare("UPDATE full_call SET _date=:_date, "
-                  "_comment=:_comment, "
-                  "_source=:_source "
+                  " _comment=:_comment, "
+                  " _source=:_source "
                   " WHERE _row=:_row,_parent=:_parent; ");
+    query.bindValue(":_row", attributes.value("_row").toInt());
     query.bindValue(":_date", attributes.value("_date"));
     query.bindValue(":_comment", attributes.value("_comment"));
     query.bindValue(":_source", attributes.value("_source"));
+    query.bindValue(":_parent", attributes.value("_parent"));
     if(!query.exec()){
         getError(&query,"Can`t update FullCall where parent="+attributes.value("_parent"));
         return;

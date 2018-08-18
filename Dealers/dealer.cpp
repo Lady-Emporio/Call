@@ -129,13 +129,54 @@ void Dealer::sql_UpdateNewDealer()
     for(auto subWindow:sublist){
         if(subWindow->widget()->objectName()=="SubTable"){
             SubTable * widget=(SubTable*)subWindow->widget();
-            if(widget->isNeedWrite!=nullptr){
-                QString table=widget->table_name;
-                if(table=="full_call"){
-                    QMap<QString,QString>attr;
-                }else if(table=="email"){
-                    QMap<QString,QString>attr;
+            QString table=widget->table_name;
+            QList<int>rows;
+            for(int i=0;i!=widget->listUpdateTW.length();++i){
+                auto item=widget->listUpdateTW.at(i);
+                int row=widget->t->row(item);
+                if(!rows.contains(row)){
+                    rows.append(row);
                 }
+            }
+            for(int row:rows){
+                QMap<QString,QString>attr;
+                attr.insert("table",table);
+                if(table=="full_call"){
+                    attr.insert("_row",widget->t->item(row,0)->text());
+                    attr.insert("_date",widget->t->item(row,1)->text());
+                    attr.insert("_comment",widget->t->item(row,2)->text());
+                    attr.insert("_source",widget->t->item(row,3)->text());
+                    attr.insert("_parent",parameters.value("_code"));
+                }else if(table=="email"){
+                    attr.insert("_row",widget->t->item(row,0)->text());
+                    attr.insert("_date",widget->t->item(row,1)->text());
+                    attr.insert("_mail",widget->t->item(row,2)->text());
+                    attr.insert("_comment",widget->t->item(row,3)->text());
+                    attr.insert("_parent",parameters.value("_code"));
+                }
+                emit sig_UpdateST(attr);
+            }
+            widget->listUpdateTW.clear();
+
+
+            if(widget->isNeedWrite!=nullptr){
+                int row=widget->t->row(widget->isNeedWrite);
+                QMap<QString,QString>attr;
+                attr.insert("table",table);
+                if(table=="full_call"){
+                    attr.insert("_row",widget->t->item(row,0)->text());
+                    attr.insert("_date",widget->t->item(row,1)->text());
+                    attr.insert("_comment",widget->t->item(row,2)->text());
+                    attr.insert("_source",widget->t->item(row,3)->text());
+                    attr.insert("_parent",parameters.value("_code"));
+                }else if(table=="email"){
+                    attr.insert("_row",widget->t->item(row,0)->text());
+                    attr.insert("_date",widget->t->item(row,1)->text());
+                    attr.insert("_mail",widget->t->item(row,2)->text());
+                    attr.insert("_comment",widget->t->item(row,3)->text());
+                    attr.insert("_parent",parameters.value("_code"));
+                }
+                emit sig_createRowSubTable(attr);
                 widget->isNeedWrite=nullptr;
             }
         }

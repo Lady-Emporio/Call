@@ -113,6 +113,8 @@ void MainWindow::sql_openDealer(QString code)
             widget, SLOT(refreshSubTable(QMap<QString,QString>,QList<QMap<QString,QString>>)));
     connect(widget, SIGNAL(sig_newRowSubTable(QMap<QString,QString>)), this, SLOT(sql_NewRow(QMap<QString,QString>)));
     connect(this, SIGNAL(sig_newRow(QMap<QString,QString>,QString)), widget, SLOT(setNewRowInSubTable(QMap<QString,QString>,QString)));
+    connect(widget, SIGNAL(sig_createRowSubTable(QMap<QString,QString>)), this, SLOT(sql_createRowSubTable(QMap<QString,QString>)));
+    connect(widget, SIGNAL(sig_UpdateST(QMap<QString,QString>)), this, SLOT(sql_updateSubT(QMap<QString,QString>)));
 }
 
 void MainWindow::sql_updateDealer(QMap<QString, QString> attr)
@@ -144,5 +146,26 @@ void MainWindow::sql_NewRow(QMap<QString, QString> parameters)
     QString newRow=S::s()->getNewRowNomber(table,code);
     emit sig_newRow(parameters,newRow);
 
+}
+
+void MainWindow::sql_createRowSubTable(QMap<QString, QString> parameters)
+{
+    QString table=parameters.value("table");
+    if(table=="full_call"){
+        S::s()->createFullCall(parameters);
+    }else if(table=="email"){
+        S::s()->createEmail(parameters);
+    }
+}
+
+void MainWindow::sql_updateSubT(QMap<QString, QString> parameters)
+{
+    QString table=parameters.value("table");
+    if(table=="full_call"){
+        qDebug()<<parameters;
+        S::s()->updateFullCall(parameters);
+    }else if(table=="email"){
+        S::s()->updateEmail(parameters);
+    }
 }
 
