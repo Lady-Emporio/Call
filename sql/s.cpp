@@ -41,7 +41,11 @@ void S::createTables()
           "_comment TEXT,"
           "_parent text REFERENCES dealers(_code) ON UPDATE CASCADE);"
         <<"CREATE INDEX IF NOT EXISTS fc_index ON full_call (_row, _parent);"
-        <<"CREATE INDEX IF NOT EXISTS e_index ON email (_row, _parent);";
+        <<"CREATE INDEX IF NOT EXISTS e_index ON email (_row, _parent);"
+       <<"CREATE TABLE IF NOT EXISTS managers("
+         "_code TEXT PRIMARY KEY, "
+         "_fullName text, "
+         "_nameForOrder text);";
     for(QString next_sql:sqls){
         query.finish();
         if(!query.exec(next_sql)){
@@ -283,4 +287,39 @@ QString S::getNewRowNomber(QString table, QString parent)
     query.next();
     QString newRow=QString("").setNum( query.value("rows").toInt()+1  );
     return newRow;
+}
+
+QList<QMap<QString, QString> > S::getManagers_listForm()
+{
+    QList<QMap<QString, QString> > mList;
+    QSqlQuery query(db);
+    if(!query.exec("SELECT _code,_fullName,_nameForOrder FROM managers;")){
+        getError(&query,"Can`t get ManagersList");
+        return mList;
+    }
+    while(query.next()){
+        QMap<QString, QString> managers;
+        managers.insert("_code",query.value("_code").toString());
+        managers.insert("_fullName",query.value("_fullName").toString());
+        managers.insert("_nameForOrder",query.value("_nameForOrder").toString());
+        mList.append(managers);
+    }
+    return mList;
+}
+
+QMap<QString, QString> S::getManagers_ObjectForm(QString _code)
+{
+    QMap<QString, QString> manager;
+    QSqlQuery query(db);
+    query.prepare("SELECT _code,_fullName,_nameForOrder FROM managers where _code=:_code;");
+    query.bindValue(":_code", _code);
+    if(!query.exec()){
+        getError(&query,"Can`t get Manager:"+_code);
+        return manager;
+    }
+    query.next();
+    manager.insert("_code",query.value("_code").toString());
+    manager.insert("_fullName",query.value("_fullName").toString());
+    manager.insert("_nameForOrder",query.value("_nameForOrder").toString());
+    return manager;
 }

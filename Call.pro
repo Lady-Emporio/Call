@@ -17,11 +17,13 @@ SOURCES += main.cpp\
     Dealers/dealer.cpp \
     sql/s.cpp \
     Dealers/dealer_list.cpp \
-    Dealers/subtable.cpp
+    Dealers/subtable.cpp \
+    other/managers.cpp
 
 HEADERS  += mainwindow.h \
     Dealers/dealer.h \
     include.h \
     sql/s.h \
     Dealers/dealer_list.h \
-    Dealers/subtable.h
+    Dealers/subtable.h \
+    other/managers.h

@@ -29,6 +29,9 @@ public:
     void updateEmail(QMap<QString,QString> attributes);
 
     QString getNewRowNomber(QString table,QString parent);
+
+    QList<QMap<QString,QString>> getManagers_listForm();
+    QMap<QString,QString> getManagers_ObjectForm(QString _code);
 };
 
 #endif // S_H

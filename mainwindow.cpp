@@ -13,8 +13,6 @@ MainWindow::~MainWindow()
 
 }
 
-
-
 void MainWindow::makeGui()
 {
     mdiArea = new QMdiArea(this);
@@ -25,6 +23,7 @@ void MainWindow::makeGui()
     this->setMenuBar(mainMenu);
 
     mainMenu->addAction("Dealer list",this,SLOT(action_OpenDealerList()));
+    mainMenu->addAction("Managers list",this,SLOT(action_OpenManagersList()));
 }
 
 void MainWindow::action_OpenDealerList()
@@ -189,5 +188,51 @@ void MainWindow::sql_updateSubT(QMap<QString, QString> parameters)
     }else if(table=="email"){
         S::s()->updateEmail(parameters);
     }
+}
+
+void MainWindow::action_OpenManagersList()
+{
+    QString title="Managers list";
+    QList<QMdiSubWindow *>	allSub=mdiArea->subWindowList();
+    for(auto x:allSub){
+        if(x->windowTitle()==title){
+            mdiArea->setActiveSubWindow(x);
+            return;
+        };
+    };
+    QMdiSubWindow *subWindow = new QMdiSubWindow(this);
+    subWindow->setWindowTitle(title);
+    QMap<QString,QString>par;
+    par.insert("list","");
+    Managers * widget=new Managers(par,this);
+    subWindow->setWidget(widget);
+    mdiArea->addSubWindow(subWindow);
+    subWindow->setAttribute(Qt::WA_DeleteOnClose);
+    subWindow->show();
+
+    connect(widget, SIGNAL(OpenManagers(QString)), this, SLOT(action_openManagersObject(QString)));
+
+}
+
+void MainWindow::action_openManagersObject(QString _code)
+{
+    QString title="Manager:"+_code;
+    QList<QMdiSubWindow *>	allSub=mdiArea->subWindowList();
+    for(auto x:allSub){
+        if(x->windowTitle()==title){
+            mdiArea->setActiveSubWindow(x);
+            return;
+        };
+    };
+    QMdiSubWindow *subWindow = new QMdiSubWindow(this);
+    subWindow->setWindowTitle(title);
+    QMap<QString,QString>par;
+    par.insert("object","");
+    par.insert("_code",_code);
+    Managers * widget=new Managers(par,this);
+    subWindow->setWidget(widget);
+    mdiArea->addSubWindow(subWindow);
+    subWindow->setAttribute(Qt::WA_DeleteOnClose);
+    subWindow->show();
 }
 
