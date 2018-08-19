@@ -51,4 +51,6 @@
 #include <QSizePolicy>
 #include <QAction>
 #include <QStyledItemDelegate>
+#include <QDate>
+#include <QDateTime>
 #endif // INCLUDE_H

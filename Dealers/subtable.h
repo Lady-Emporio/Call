@@ -11,7 +11,16 @@ public:
         return 0;
     }
 };
+class TableWidgetItem : public QTableWidgetItem
+{
+public:
+    explicit TableWidgetItem(const QString &text, int type = Type):QTableWidgetItem(text,type){}
 
+    bool operator< (const QTableWidgetItem&  other) const{
+        return QDateTime::fromString(this->text(),"dd.MM.yyyy HH:mm:ss")>QDateTime::fromString(other.text(),"dd.MM.yyyy HH:mm:ss");
+    }
+
+};
 
 class SubTable : public QWidget
 {

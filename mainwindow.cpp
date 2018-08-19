@@ -103,6 +103,13 @@ void MainWindow::sql_openDealer(QString code)
     for(QMdiSubWindow *x:allSub){
         if(x->windowTitle()==title){
             mdiArea->setActiveSubWindow(x);
+            Dealer * dealer=(Dealer * )x->widget();
+            for(auto subWin:dealer->mdiArea->subWindowList()){
+                if(subWin->windowTitle()=="Full call"){
+                    dealer->mdiArea->setActiveSubWindow(subWin);
+                    break;
+                }
+            }
             return;
         };
     };

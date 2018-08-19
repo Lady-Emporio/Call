@@ -64,7 +64,7 @@ void SubTable::refresh(QMap<QString, QString> attr, QList<QMap<QString, QString>
             QMap<QString,QString> row=data[i];
             if(table_name=="full_call"){
                 QTableWidgetItem * c0=new QTableWidgetItem(row.value("_row"));
-                QTableWidgetItem * c1=new QTableWidgetItem(row.value("_date"));
+                TableWidgetItem * c1=new TableWidgetItem(row.value("_date"));
                 QTableWidgetItem * c2=new QTableWidgetItem(row.value("_comment"));
                 QTableWidgetItem * c3=new QTableWidgetItem(row.value("_source"));
                 t->setItem(i,0,c0);
@@ -78,6 +78,7 @@ void SubTable::refresh(QMap<QString, QString> attr, QList<QMap<QString, QString>
                 t->setItem(i,3,new QTableWidgetItem(row.value("_comment")));
             }
         }
+        t->sortItems(1, Qt::DescendingOrder);
     }
 }
 
@@ -121,9 +122,9 @@ void SubTable::addNewRow(QString table, QString nomber)
         t->insertRow( row );
         isNeedWrite=new QTableWidgetItem(nomber);
         t->setItem(row,0,isNeedWrite);
-        for(int i=1;i<t->columnCount();++i){
-            t->setItem(row,i,new QTableWidgetItem(""));
-        }
+        t->setItem(row,1,new TableWidgetItem(QDateTime::currentDateTime().toString("dd.MM.yyyy HH:mm:ss")));
+        t->setItem(row,2,new QTableWidgetItem(""));
+        t->setItem(row,3,new QTableWidgetItem(""));
         conditionalAppearance();
     }
 }
