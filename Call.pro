@@ -18,7 +18,8 @@ SOURCES += main.cpp\
     sql/s.cpp \
     Dealers/dealer_list.cpp \
     Dealers/subtable.cpp \
-    other/managers.cpp
+    other/managers.cpp \
+    AnyTable/any.cpp
 
 HEADERS  += mainwindow.h \
     Dealers/dealer.h \
@@ -26,4 +27,5 @@ HEADERS  += mainwindow.h \
     sql/s.h \
     Dealers/dealer_list.h \
     Dealers/subtable.h \
-    other/managers.h
+    other/managers.h \
+    AnyTable/any.h

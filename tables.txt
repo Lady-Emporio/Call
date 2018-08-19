@@ -1,0 +1,52 @@
+dealers
+	_code
+	_name
+	_comment
+	_activePhone 
+	_distryPhone
+full_call
+	_row INTEGER
+	_date
+	_comment
+	_source
+	_parent
+email
+	_row INTEGER
+	_date
+	_mail 
+	_comment
+	_parent
+managers
+	_code
+	_fullName
+	_nameForOrder
+orders
+	_code INTEGER AUTOINCREMENT//always
+	_date
+	_manager text REFERENCES managers(_code) ON UPDATE CASCADE)
+	_workList 
+	_client
+	_model
+	_version
+	_colors
+	_options
+	_mark text CHECK 0,1
+
+
+CreateAnyTable(QMap<QString, QString> attributes)
+	QMap<QString, QString> attributes
+	attributes.insert("Table_Name",);
+
+openAnyTable(QMap<QString, QString>  par)
+	par.insert("Table_Name","");
+	par.insert("_code" or "_parent");
+	
+AnyTable:
+	parameters.value("typeForm") - type form: "list" or "object"
+	parameters.value("Table_Name")
+	attr - field of table;
+	
+	sig_anyOpen(QMap<QString,QString>> attr):
+		attr.insert("Table_Name",table);
+		attr.insert("_code",dl->item(row,0));
+		

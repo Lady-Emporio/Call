@@ -6,7 +6,7 @@
 #include "Dealers/dealer_list.h"
 #include "sql/s.h"
 #include "other/managers.h"
-
+#include "AnyTable/any.h"
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -29,6 +29,8 @@ public slots:
     void sql_updateSubT(QMap<QString,QString>parameters);
     void action_OpenManagersList();
     void action_openManagersObject(QString _code);
+    void action_OpenOrdersList();
+    void action_openAny(QMap<QString,QString> par);
 signals:
     void dealerListRefresh(QList<QMap<QString,QString>> dlist);
     void sig_refreshSubTable(QMap<QString,QString>attr,QList<QMap<QString,QString>>data);

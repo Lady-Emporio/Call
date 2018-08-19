@@ -32,6 +32,11 @@ public:
 
     QList<QMap<QString,QString>> getManagers_listForm();
     QMap<QString,QString> getManagers_ObjectForm(QString _code);
+
+    QList<QString>getAttrTable(QString Table_Name);
+    QList<QMap<QString,QString> >getList(QString Table_Name,QList<QString>attr);
+    QMap<QString,QString> openAnyTable(QMap<QString,QString>par);
+    void CreateAnyTable(QMap<QString,QString> attributes);
 };
 
 #endif // S_H

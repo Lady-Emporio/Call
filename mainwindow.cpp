@@ -24,6 +24,7 @@ void MainWindow::makeGui()
 
     mainMenu->addAction("Dealer list",this,SLOT(action_OpenDealerList()));
     mainMenu->addAction("Managers list",this,SLOT(action_OpenManagersList()));
+    mainMenu->addAction("Orders list",this,SLOT(action_OpenOrdersList()));
 }
 
 void MainWindow::action_OpenDealerList()
@@ -234,5 +235,71 @@ void MainWindow::action_openManagersObject(QString _code)
     mdiArea->addSubWindow(subWindow);
     subWindow->setAttribute(Qt::WA_DeleteOnClose);
     subWindow->show();
+}
+
+void MainWindow::action_OpenOrdersList()
+{
+    QMap<QString,QString>par;
+    par.insert("Table_Name","orders");
+    par.insert("typeForm","list");
+    QMap<QString,QString>attr;
+    attr.insert("_code","");
+    attr.insert("_date","");
+    attr.insert("_manager","");
+    attr.insert("_client","");
+    QString title="Table:"+par.value("Table_Name");
+    QList<QMdiSubWindow *>	allSub=mdiArea->subWindowList();
+    for(auto x:allSub){
+        if(x->windowTitle()==title){
+            mdiArea->setActiveSubWindow(x);
+            return;
+        };
+    };
+    QMdiSubWindow *subWindow = new QMdiSubWindow(this);
+    subWindow->setWindowTitle(title);
+    AnyTable * widget=new AnyTable(par,attr,this);
+    subWindow->setWidget(widget);
+    mdiArea->addSubWindow(subWindow);
+    subWindow->setAttribute(Qt::WA_DeleteOnClose);
+    subWindow->show();
+
+    connect(widget, SIGNAL(sig_anyOpen(QMap<QString,QString>)), this, SLOT(action_openAny(QMap<QString,QString>)));
+}
+
+void MainWindow::action_openAny(QMap<QString, QString> par)
+{
+    QString table=par.value("Table_Name");
+    QString code=par.value("_code");
+    QString parent=par.value("_parent");
+    if(code==""){
+        if(parent!=""){
+            //createNewSubTable(QMap<QString, QString> par);
+        }else{
+            //createNewTable(QMap<QString, QString> par);
+        }
+    }else{
+        //openExistTable(QMap<QString, QString> par);
+    }
+//    QMap<QString,QString>pars;
+//    pars.insert("Table_Name",table);
+//    pars.insert("typeForm","object");
+//    QMap<QString,QString>attr=S::s()->openAnyTable(par);;
+
+
+//    QString title=pars.value("Table_Name")+":"+code;
+//    QList<QMdiSubWindow *>	allSub=mdiArea->subWindowList();
+//    for(auto x:allSub){
+//        if(x->windowTitle()==title){
+//            mdiArea->setActiveSubWindow(x);
+//            return;
+//        };
+//    };
+//    QMdiSubWindow *subWindow = new QMdiSubWindow(this);
+//    subWindow->setWindowTitle(title);
+//    AnyTable * widget=new AnyTable(pars,attr,this);
+//    subWindow->setWidget(widget);
+//    mdiArea->addSubWindow(subWindow);
+//    subWindow->setAttribute(Qt::WA_DeleteOnClose);
+//    subWindow->show();
 }
 

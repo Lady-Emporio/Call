@@ -42,10 +42,21 @@ void S::createTables()
           "_parent text REFERENCES dealers(_code) ON UPDATE CASCADE);"
         <<"CREATE INDEX IF NOT EXISTS fc_index ON full_call (_row, _parent);"
         <<"CREATE INDEX IF NOT EXISTS e_index ON email (_row, _parent);"
-       <<"CREATE TABLE IF NOT EXISTS managers("
-         "_code TEXT PRIMARY KEY, "
-         "_fullName text, "
-         "_nameForOrder text);";
+        <<"CREATE TABLE IF NOT EXISTS managers("
+          "_code TEXT PRIMARY KEY, "
+          "_fullName text, "
+          "_nameForOrder text);"
+        <<"CREATE TABLE IF NOT EXISTS orders("
+          "_code INTEGER PRIMARY KEY AUTOINCREMENT, "
+          "_date TEXT, "
+          "_manager text REFERENCES managers(_code) ON UPDATE CASCADE, "
+          " _workList  text, "
+          " _client text, "
+          " _model text, "
+          " _version text, "
+          " _colors text, "
+          " _mark text DEFAULT '1', "
+          " _options text);";
     for(QString next_sql:sqls){
         query.finish();
         if(!query.exec(next_sql)){
@@ -322,4 +333,132 @@ QMap<QString, QString> S::getManagers_ObjectForm(QString _code)
     manager.insert("_fullName",query.value("_fullName").toString());
     manager.insert("_nameForOrder",query.value("_nameForOrder").toString());
     return manager;
+}
+
+QList<QString> S::getAttrTable(QString Table_Name)
+{
+QList<QString>fiend;
+QSqlQuery query(db);
+QRegExp whiteDel("\\s");
+QRegExp nonwordDel("\\W");
+Table_Name=Table_Name.replace(whiteDel,"");
+Table_Name=Table_Name.replace(nonwordDel,"");
+QString sql="pragma table_info("+Table_Name+");";
+if(!query.exec(sql)){
+    getError(&query,"Can`t pragma table_info:"+Table_Name);
+    return fiend;
+}
+
+while(query.next()){
+    QString fieldName=query.value("name").toString();
+    fiend.append(fieldName);
+}
+return fiend;
+}
+
+QList<QMap<QString, QString> > S::getList(QString Table_Name, QList<QString> attr)
+{
+QSqlQuery query(db);
+QList<QMap<QString, QString> > tableList;
+QRegExp whiteDel("\\s");
+QRegExp nonwordDel("\\W");
+Table_Name=Table_Name.replace(whiteDel,"");
+Table_Name=Table_Name.replace(nonwordDel,"");
+
+QString sql="SELECT * FROM "+Table_Name+";";
+if(!query.exec(sql)){
+    getError(&query,"Can`t get *from table:"+Table_Name);
+    return tableList;
+}
+while(query.next()){
+    QMap<QString, QString> row;
+    for(QString key:attr){
+        row.insert(key,query.value(key).toString());
+    }
+    tableList.append(row);
+}
+return tableList;
+}
+
+QMap<QString, QString> S::openAnyTable(QMap<QString, QString>  par)
+{
+   QMap<QString, QString>  attr;
+   QSqlQuery query(db);;
+   QRegExp whiteDel("\\s");
+   QRegExp nonwordDel("\\W");
+   QString Table_Name=par.value("Table_Name");
+   Table_Name=Table_Name.replace(whiteDel,"");
+   Table_Name=Table_Name.replace(nonwordDel,"");
+
+   QString sql="pragma table_info("+Table_Name+");";
+   if(!query.exec(sql)){
+       getError(&query,"Can`t pragma table_info:"+Table_Name);
+       return attr;
+   }
+   QList<QString>fiends;
+   while(query.next()){
+       QString fieldName=query.value("name").toString();
+       fiends.append(fieldName);
+   }
+   query.finish();
+
+   sql=par.contains("_code")?"SELECT * FROM "+Table_Name+" WHERE _code=:_code"
+   :"SELECT * FROM "+Table_Name+" WHERE _parent=:_parent";
+
+
+   query.prepare(sql);
+   par.contains("_code")?
+               query.bindValue(":_code",par.value("_code")):
+               query.bindValue(":_parent",par.value("_parent"));
+   if(!query.exec()){
+       getError(&query,"Can`t select *from:"+Table_Name+" from code or parent");
+       return attr;
+   }
+   query.next();
+   for(QString field:fiends){
+       attr.insert(field,query.value(field).toString());
+    }
+   return attr;
+}
+
+
+void S::CreateAnyTable(QMap<QString, QString> attributes)
+{
+QSqlQuery query(db);
+QString table=attributes.value("Table_Name");
+QRegExp whiteDel("\\s");
+QRegExp nonwordDel("\\W");
+table=table.replace(whiteDel,"");
+table=table.replace(nonwordDel,"");
+
+QString sql="pragma table_info("+table+");";
+if(!query.exec(sql)){
+    getError(&query,"Can`t pragma table_info:"+table);
+    return;
+}
+QList<QString>fiend;
+while(query.next()){
+    QString fieldName=query.value("name").toString();
+    fiend.append(fieldName);
+}
+query.finish();
+
+sql="INSERT INTO "+table+" ( ";
+for(int i=0;i!=fiend.length();++i){
+    sql+=( (i+1)!=fiend.length()?
+    fiend[i]+",":fiend[i]+") VALUES (");
+}
+for(int i=0;i!=fiend.length();++i){
+    sql+=( (i+1)!=fiend.length()?
+    ":"+fiend[i]+",":":"+fiend[i]+");");
+}
+query.prepare(sql);
+for(QString value:fiend){
+    query.bindValue(":"+value, attributes.value("value"));
+}
+if(!query.exec()){
+    getError(&query,"Can`t Create:"+table);
+    return;
+};
+db.commit();
 }
